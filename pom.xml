@@ -259,9 +259,9 @@
     </plugins>
   </build>
 
-  <url>https://github.com/${owner}/${name}/</url>
+  <url>https://github.com/velo/feign-java9/</url>
 
-  <inceptionYear>${year}</inceptionYear>
+  <inceptionYear>2017</inceptionYear>
 
   <licenses>
     <license>
@@ -281,9 +281,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:${owner}/${name}.git</connection>
-    <developerConnection>scm:git:git@github.com:${owner}/${name}.git</developerConnection>
-    <url>https://github.com/${owner}/${name}/</url>
+    <connection>scm:git:git@github.com:velo/feign-java9.git</connection>
+    <developerConnection>scm:git:git@github.com:velo/feign-java9.git</developerConnection>
+    <url>https://github.com/velo/feign-java9/</url>
   </scm>
 
   <distributionManagement>

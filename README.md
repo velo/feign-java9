@@ -1,23 +1,19 @@
-# ${name}
+# feign-java9
 
-[![Build Status](https://travis-ci.org/${owner}/${name}.svg?branch=master)](https://travis-ci.org/${owner}/${name}?branch=master) 
-[![Coverage Status](https://coveralls.io/repos/github/${owner}/${name}/badge.svg?branch=master)](https://coveralls.io/github/${owner}/${name}?branch=master) 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.marvinformatics/${name}/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.marvinformatics/${name}/) 
-[![Issues](https://img.shields.io/github/issues/${owner}/${name}.svg)](https://github.com/${owner}/${name}/issues) 
-[![Forks](https://img.shields.io/github/forks/${owner}/${name}.svg)](https://github.com/${owner}/${name}/network) 
-[![Stars](https://img.shields.io/github/stars/${owner}/${name}.svg)](https://github.com/${owner}/${name}/stargazers)
-
-maven.boilerplate contains a set of configuration files for CI(travis, appveyor), coverage(coveralls+jacoco), code format(eclipse+maven), licensing, other maven plugins and all other things I think I will need accross multiple projects
-
-# Why?
-![image](https://cloud.githubusercontent.com/assets/136590/14231013/3752c72a-f9c6-11e5-9372-af23df11d18d.png)
+[![Build Status](https://travis-ci.org/velo/feign-java9.svg?branch=master)](https://travis-ci.org/velo/feign-java9?branch=master) 
+[![Coverage Status](https://coveralls.io/repos/github/velo/feign-java9/badge.svg?branch=master)](https://coveralls.io/github/velo/feign-java9?branch=master) 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.marvinformatics.feign/feign-java9/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.marvinformatics.feign/feign-java9/) 
+[![Issues](https://img.shields.io/github/issues/velo/feign-java9.svg)](https://github.com/velo/feign-java9/issues) 
+[![Forks](https://img.shields.io/github/forks/velo/feign-java9.svg)](https://github.com/velo/feign-java9/network) 
+[![Stars](https://img.shields.io/github/stars/velo/feign-java9.svg)](https://github.com/velo/feign-java9/stargazers)
 
 
-I wanna all my projects share what I think makes life easier without having to remember copy and pasting all.
+This module directs Feign's http requests to Java9 [New HTTP/2 Client](http://www.javamagazine.mozaicreader.com/JulyAug2017#&pageSet=39&page=0) that implements HTTP/2.
 
-This way, a script can remember to copy and paste for me.
+To use New HTTP/2 Client with Feign, use Java SDK 9 and add `feign.java9` module to your `module-info.java`. Then, configure Feign to use the Java9HttpClient:
 
-As a preparation step, it's really wise to run
-````
-$ mvn com.github.ekryd.sortpom:sortpom-maven-plugin:2.4.0:sort -Dsort.keepBlankLines=true "-Dsort.lineSeparator=\n" -Dsort.predefinedSortOrder=custom_1 -Dsort.createBackupFile=false
-````
+```java
+GitHub github = Feign.builder()
+                     .client(new Java9HttpClient())
+                     .target(GitHub.class, "https://api.github.com");
+```
