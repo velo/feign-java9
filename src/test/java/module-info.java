@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module feign.java9 {
+module feign.java9.test {
     requires jdk.incubator.httpclient;
     requires feign.core;
-    exports feign.java9.httpclient;
+    requires feign.java9;
+    requires assertj.core;
 }

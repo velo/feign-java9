@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2017 Marvin Herman Froeder (marvin@marvinformatics.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package feign.java9.httpclient;
 
 import java.io.ByteArrayInputStream;
@@ -18,48 +33,37 @@ import jdk.incubator.http.HttpClient.Redirect;
 import jdk.incubator.http.HttpRequest.*;
 import jdk.incubator.http.HttpResponse.BodyHandler;
 
-public class Java9HttpClient implements Client
-{
+public class Java9HttpClient implements Client {
 
-    public Response execute(Request request, Options options) throws IOException
-    {
+    public Response execute(Request request, Options options) throws IOException {
         final HttpClient client = HttpClient.newBuilder()
-            .followRedirects(Redirect.ALWAYS)
-            .build();
+                .followRedirects(Redirect.ALWAYS)
+                .build();
 
         URI uri;
-        try
-        {
+        try {
             uri = new URI(request.url());
-        }
-        catch (final URISyntaxException e)
-        {
+        } catch (final URISyntaxException e) {
             throw new IOException("Invalid uri " + request.url(), e);
         }
 
         final BodyProcessor body;
-        if(request.body() == null)
-        {
+        if (request.body() == null) {
             body = HttpRequest.noBody();
-        }
-        else
-        {
+        } else {
             body = BodyProcessor.fromByteArray(request.body());
         }
 
         final HttpRequest httpRequest = HttpRequest.newBuilder()
-            .uri(uri)
-            .method(request.method(), body)
-            .headers(asString(request.headers()))
-            .build();
+                .uri(uri)
+                .method(request.method(), body)
+                .headers(asString(request.headers()))
+                .build();
 
         HttpResponse<byte[]> httpResponse;
-        try
-        {
+        try {
             httpResponse = client.send(httpRequest, BodyHandler.asByteArray());
-        }
-        catch (final InterruptedException e)
-        {
+        } catch (final InterruptedException e) {
             throw new IOException("Invalid uri " + request.url(), e);
         }
 
@@ -67,34 +71,30 @@ public class Java9HttpClient implements Client
 
         OptionalLong length = httpResponse.headers().firstValueAsLong("Content-Length");
 
-
         final Response response = Response.builder()
-            .body(new ByteArrayInputStream(httpResponse.body()), length.isPresent()? (int)length.getAsLong() : null)
-            .reason(httpResponse.headers().firstValue("Reason-Phrase").orElse(null))
-            .request(request)
-            .status(httpResponse.statusCode())
-            .headers(castMapCollectType(httpResponse.headers().map()))
-            .build();
+                .body(new ByteArrayInputStream(httpResponse.body()), length.isPresent() ? (int) length.getAsLong() : null)
+                .reason(httpResponse.headers().firstValue("Reason-Phrase").orElse(null))
+                .request(request)
+                .status(httpResponse.statusCode())
+                .headers(castMapCollectType(httpResponse.headers().map()))
+                .build();
         return response;
     }
 
-    private Map<String, Collection<String>> castMapCollectType(Map<String, List<String>> map)
-    {
+    private Map<String, Collection<String>> castMapCollectType(Map<String, List<String>> map) {
         final Map<String, Collection<String>> result = new HashMap<>();
         map.forEach((key, value) -> result.put(key, new HashSet<>(value)));
         return result;
     }
 
-    private String[] asString(Map<String, Collection<String>> headers)
-    {
+    private String[] asString(Map<String, Collection<String>> headers) {
         return headers.entrySet().stream()
-            .flatMap(entry -> entry.getValue()
-                .stream()
-                .map(value -> Arrays.asList(entry.getKey(), value))
-                .flatMap(List::stream)
-            )
-            .collect(Collectors.toList())
-            .toArray(new String[0]);
+                .flatMap(entry -> entry.getValue()
+                        .stream()
+                        .map(value -> Arrays.asList(entry.getKey(), value))
+                        .flatMap(List::stream))
+                .collect(Collectors.toList())
+                .toArray(new String[0]);
     }
 
 }
