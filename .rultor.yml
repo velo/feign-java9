@@ -29,6 +29,7 @@ merge:
   commanders:
   - velo
   script: |-
+    mvn -v
     mvn install -Pci -B --settings ../settings.xml
 
 env:
@@ -36,6 +37,7 @@ env:
 
 release:
   script: |-
+    mvn -v
     mvn versions:set "-DnewVersion=${tag}"
     git commit -am "${tag}"
     mvn deploy -Pci -B -Prelease --settings ../settings.xml -Dgpg.homedir=..
