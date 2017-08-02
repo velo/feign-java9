@@ -77,6 +77,10 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.0.0-M1</version>
+          <configuration>
+            <!-- plugin is not working with java 9 MJAVADOC-489 -->
+            <additionalparam>--module-path ${basedir}/target/classes:${env.HOME}/.m2/repository/io/github/openfeign/feign-core/${feign.version}/feign-core-${feign.version}.jar:</additionalparam>
+          </configuration>
           <executions>
             <execution>
               <id>attach-javadocs</id>
