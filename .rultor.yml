@@ -37,7 +37,7 @@ env:
 
 release:
   script: |-
-    mvn -v
+    env
     mvn versions:set "-DnewVersion=${tag}"
     git commit -am "${tag}"
     mvn deploy -Pci -B -Prelease --settings ../settings.xml -Dgpg.homedir=..
