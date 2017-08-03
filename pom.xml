@@ -21,7 +21,7 @@
 
   <groupId>com.marvinformatics.feign</groupId>
   <artifactId>feign-java9</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1</version>
 
   <name>feign-java9</name>
   <description>This module directs Feign's http requests to Java9 New HTTP/2 Client.</description>
