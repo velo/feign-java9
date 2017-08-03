@@ -23,6 +23,9 @@
   <artifactId>feign-java9</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
+  <name>feign-java9</name>
+  <description>This module directs Feign's http requests to Java9 New HTTP/2 Client.</description>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
