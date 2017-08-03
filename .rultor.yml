@@ -18,7 +18,7 @@ architect:
 - velo
 
 docker:
-  image: "velo/rultor9"
+  image: "velo/rultor9:178ea"
 
 assets:
   secring.gpg: velo/.assets#maven/secring.gpg
@@ -29,17 +29,15 @@ merge:
   commanders:
   - velo
   script: |-
-    mvn -v
     mvn install -Pci -B --settings ../settings.xml
 
 env:
   MAVEN_OPTS: -XX:MaxPermSize=256m -Xmx1g
 
 release:
+  commanders:
+  - velo
   script: |-
-    env
     mvn versions:set "-DnewVersion=${tag}"
     git commit -am "${tag}"
     mvn deploy -Pci -B -Prelease --settings ../settings.xml -Dgpg.homedir=..
-  commanders:
-  - velo
