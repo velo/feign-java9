@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------------
+# Maven on docker scripts
+#
+# Tools that need to be available:
+# ------------------
+#   docker - must be accessible from command line
+#
+# Optional ENV vars
+# -----------------
+#   LOCAL_RESPOSITORY - location of maven local repository
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#     e.g. to debug Maven itself, use
+#       export MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+#   DOCKER_OPTS - parameters passed to the docker when running mvnd
+#     e.g. to disable network used
+#       export DOCKER_OPTS=--net=none
+# ----------------------------------------------------------------------------
+
+# stop on errors
+set -e
+# poor man "stack trace"
+#SCRIPT=$0
+#err_report() {
+#    echo "Error on $SCRIPT line $1"
+#}
+#trap 'err_report $LINENO' ERR
+
+
+# enable script debug when maven debug is enabled
+[[ ( "$*" == *'-X'* ) || ( "$*" == *'--debug'* ) ]] && set -x
+
+
+# Location - root of project
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+# resolve local repository
+if [ -z "$LOCAL_RESPOSITORY" ] ; then
+  LOCAL_RESPOSITORY="$HOME/.m2"
+else
+  # make it fully qualified
+  LOCAL_RESPOSITORY=$(cd "$LOCAL_RESPOSITORY" && pwd)
+fi
+
+# echo "Using m2 repo at $LOCAL_RESPOSITORY"
+
+# add argument -nn / --no-network => --net=none
+
+# default image to run, to change it, create a file called 'mvnd.properties' and override properties
+BASE_IMAGE="ubuntu:17.10"
+JAVA_DISTRIBUTION="openjdk"
+JAVA_VERSION="8"
+MAVEN_VERSION="3.5.2"
+
+BATCH_MODE=false
+[[ ( "$*" == *'-B'* ) || ( "$*" == *'--batch-mode'* ) ]] && BATCH_MODE=true
+
+if [[ ( "$BATCH_MODE" == 'false' ) ]] ; then
+  DOCKER_OPTS="${DOCKER_OPTS} -it"
+fi
+
+PROPERTIES_FILE="$DIR/mvnd.properties"
+if [ -f "$PROPERTIES_FILE" ]; then
+  eval "$(cat "$PROPERTIES_FILE")"
+fi
+
+MVND_IMAGE=mvnd/"${BASE_IMAGE//[^[:alnum:]]/_}-${JAVA_DISTRIBUTION}-${JAVA_VERSION}-${MAVEN_VERSION}"
+
+if [[ ( "$*" == *'-U'* ) || ( "$*" == *'--update-snapshots'* ) ]]; then
+  # update docker image when updating maven dependencies
+  docker pull "$MVND_IMAGE"
+fi
+
+if [[ "$EXTRA_VOLUMUES" ]]; then
+  DOCKER_OPTS="${DOCKER_OPTS} -v $EXTRA_VOLUMUES"
+fi
+
+ JAVA_HOME=$(docker run $MVND_IMAGE jrunscript -e 'java.lang.System.out.println(java.lang.System.getProperty("java.home"));')
+
+docker run \
+    ${DOCKER_OPTS} \
+    -v "${LOCAL_RESPOSITORY}:/root/.m2" \
+    -v "$DIR:/sources" \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -w /sources \
+    -e "USER=${USER}" \
+    -e "MAVEN_OPTS=${MAVEN_OPTS}" \
+    -e "JAVA_HOME=${JAVA_HOME}" \
+    $MVND_IMAGE \
+    mvn "$@"
+
+if [[ ("$*" == *'-v'*) || "$*" == *'--version'* ]]; then
+  bold=$(tput bold)
+  normal=$(tput sgr0)
+  echo "${bold}Maven meets docker v0.1-alpha${normal}"
+  docker -v
+  echo "Image: $MVND_IMAGE"
+  echo "Host system: $(uname -a)"
+fi

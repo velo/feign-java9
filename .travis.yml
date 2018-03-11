@@ -1,8 +1,12 @@
 language: java
 
-sudo: false
-dist: trusty
-jdk: oraclejdk9
+sudo: required
+
+services:
+  - docker
+
+install:
+  - ./mvnd -version
 
 script:
-  - mvn clean install -Pci -B
+  - ./mvnd install -Pci -B -U
