@@ -25,6 +25,9 @@ assets:
   settings.xml: velo/.assets#maven/settings.xml
   pubring.gpg: velo/.assets#maven/pubring.gpg
 
+docker:
+  image: "velo/rultor8"
+
 merge:
   commanders:
   - velo
